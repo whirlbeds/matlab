@@ -1,0 +1,11 @@
+figure;
+subplot(2,1,1), box on, hold on;
+plot(t, real(h), 'k-');
+set(gca,'FontSize',16);
+xlabel('t');
+ylabel('h(t)');
+subplot(2,1,2), box on, hold on;
+plot(t, real(g), 'k-');
+set(gca,'FontSize',16);
+xlabel('t');
+ylabel('g(t)');
