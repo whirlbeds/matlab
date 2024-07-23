@@ -62,11 +62,11 @@ $，$a_2 = -0.9506$，上述合成模型的共振峰频率是多少？用zplane 
 =\frac{z^2}{z^2-a_1z-a_2}$$
 
 \textcircled{2}共振峰频率$$f=\frac{\omega}{2\pi}$$
-而模拟频率$\omega$和数字频率$\Omega$有关系$$\Omega=\omega T$$
-故$$f=\frac{\Omega}{2\pi T}\approx1kHz$$
+模拟频率$\omega$和数字频率$\Omega$有关系$\Omega=\omega T$,求解二次方程，得到$$\Omega\approx \arctan\frac{0.68939}{0.68945}\approx 0.7854$$
+故$$f=\frac{\Omega}{2\pi T}=\frac{0.7854}{2\pi}\times8000\approx1kHz$$
 
 \textcircled{3}用zplane,freqz分别绘出零极点图、频率响应
-如下：
+如下（代码见附件，下同）：
 \begin{figure}[htbp]
 	\centering
 	\begin{minipage}{0.49\linewidth}
@@ -127,7 +127,7 @@ $，$a_2 = -0.9506$，上述合成模型的共振峰频率是多少？用zplane 
 \textbf{\color{gray}完善 speechproc.m 程序， 在循环中添加程序： 用你计算得到的激励信号 e(n) 和预
 测模型系数 $\{a_i\} $ ， 用 filter 计算重建语音 $\hat{s}(n)$ 。}
 
-类似地有（注意输入输出）：
+类似地有（注意输入输出调转）：
 \begin{lstlisting}[language=matlab]
 % (5) 在此位置写程序，用filter函数和exc重建语音，注意保持滤波器状态
     [rec_ftr,zi_rec] = filter(1,A,exc_ftr,zi_rec);
@@ -141,7 +141,7 @@ $，$a_2 = -0.9506$，上述合成模型的共振峰频率是多少？用zplane 
 
 信号所载信息均为“电灯比油灯进步多了”。
 e(n)信号噪声较大；s(n)信号和$\hat{s}(n)$信号听起来几无区别，且两者噪声相对e(n)较小。因为
-e(n)是语音信号s(n)和$\sum_{k=1}^{N}a_ks(n-k)$的差（残差），自然与s(n)相差较大；作为激励信号可以
+e(n)是语音信号s(n)和$\sum_{k=1}^{N}a_ks(n-k)$的差（残差），自然与s(n)相差较大；但作为激励信号可以
 较好重建语音。
 \begin{figure}[h]
 	\centering
@@ -288,14 +288,56 @@ end
 	\begin{minipage}{0.49\linewidth}
 		\centering
 		\includegraphics[width=1\linewidth]{drawing2-11.png}
-		\caption{合成信号比较}
+		\caption{变速信号比较}
 	\end{minipage}
 \end{figure}
 听取语音，记录两个语音(s,s\_v)播放的大致时间，以及观察图像横坐标，可知信号长度确实增加了一倍;
 此外音调并无明显变化，说明实现了变速不变调。
-
+\section{变调不变速}
 \subsection*{(12)}
 \textbf{\color{gray}重新考察（1） 中的系统， 
 将其共振峰频率提高 150Hz 后的 $a_1$ 和 $a_2$ 分别是多少？}
 
+由于原系统共轭极点为$z=0.68945\pm 0.68939j=0.975e^{\pm j0.7854}$，而
+利用$$f=\frac{\Omega}{2\pi T}$$有
+$$\Delta f=\frac{\Delta\Omega}{2\pi T}$$
+给定$\Delta f=150Hz$，则$$\Delta\Omega\approx0.11781$$
+对每一个极点乘上因子
+$e^{\pm j\Delta\Omega}$即可按需改变共振峰频率。注意因子指数的正负与原指数
+正负一致。由此得到新系统共轭极点为$$z=0.975e^{\pm j0.9032}=0.6036\pm 0.7657j
+=\frac{a_1\pm j\sqrt{-4a_2-a_1^2}}{2}$$
+解得$a_1=1.2072,a_2=-0.9506$。
+
+\subsection*{(13)}
+\textbf{\color{gray}重新考察（1） 中的系统， 
+将其共振峰频率提高 150Hz 后的 $a_1$ 和 $a_2$ 分别是多少？}
+
+首先将基音周期减半，只需引入新的$k_t$以及改为$PT/2$：
+\begin{lstlisting}[language=matlab]
+while k_t <= FL*n
+    exc_syn_t(k_t) = G;
+    k_t = k_t + ceil(PT/2);
+end
+\end{lstlisting}
+
+处理共振峰频率可以采用（12）中的方法。
+现需要改造滤波器。原有的滤波器由[1,A]表示，需要修改为[B,T]以改变共振峰频率。
+先后使用tf2zp和zp2tf函数可以完成操作。
+\begin{lstlisting}[language=matlab]
+[z,pole,r] = tf2zp(1,A);
+pole_add = pole.*exp(1j*0.11781*sign(imag(pole)));
+[B,T] = zp2tf(z,pole_add,r);
+
+[s_syn_t((n-1)*FL+1:n*FL),zi_syn_t] = filter(B,T,exc_syn_t((n-1)*FL+1:n*FL),zi_syn_t);
+\end{lstlisting}
+\begin{figure}[h]
+	\centering
+	\begin{minipage}{0.49\linewidth}
+		\centering
+		\includegraphics[width=1\linewidth]{drawing2-13.png}
+		\caption{变调信号比较}
+	\end{minipage}
+\end{figure}
+听取语音，发现明显由低沉男声变为尖细女声，即频率提高；观察图像，发现时长
+相等，即没有变速。这就实现了变调不变速。
 \end{document}

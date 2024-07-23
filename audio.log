@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex 2024.2.26)  23 JUL 2024 16:06
+This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex 2024.2.26)  23 JUL 2024 18:58
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -651,19 +651,22 @@ File: drawing2-10.png Graphic file (type bmp)
  [5]
 File: drawing2-11.png Graphic file (type bmp)
 <drawing2-11.png>
- [6] (audio.aux)
+ [6]
+File: drawing2-13.png Graphic file (type bmp)
+<drawing2-13.png>
+ [7] (audio.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2022/08/05>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 12745 strings out of 409673
- 298462 string characters out of 5781809
+ 12767 strings out of 409673
+ 298764 string characters out of 5781809
  2036630 words of memory out of 5000000
- 34595 multiletter control sequences out of 15000+600000
+ 34616 multiletter control sequences out of 15000+600000
  564150 words of font info for 87 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  93i,8n,97p,383b,1671s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on audio.pdf (6 pages).
+Output written on audio.pdf (7 pages).
