@@ -58,7 +58,7 @@
 $，$a_2 = -0.9506$，上述合成模型的共振峰频率是多少？用zplane ， freqz ， impz分别绘出零
 极点图，频率响应和单位样值响应。用 filter 绘出单位样值响应，比较和 impz 的是否相同。}
 
-\textcircled{1}上述滤波器的传播函数为$$H(z)=\frac{1}{1-\frac{a_1}{z}-\frac{a_2}{z^2}} 
+\textcircled{1}上述滤波器的传递函数为$$H(z)=\frac{1}{1-\frac{a_1}{z}-\frac{a_2}{z^2}} 
 =\frac{z^2}{z^2-a_1z-a_2}$$
 
 \textcircled{2}共振峰频率$$f=\frac{\omega}{2\pi}$$
@@ -116,7 +116,7 @@ $，$a_2 = -0.9506$，上述合成模型的共振峰频率是多少？用zplane 
 激励信号 e(n) 。}
 
 由于分帧处理，需要保存滤波器的最终条件zf，且需要考虑滤波器的初始状态zi，在代码中表现为更新zi\_pre
-的值。
+的值。注意求激励即预测残差需要将滤波器输入输出对换，A应作分子，1应作分母。
 \begin{lstlisting}[language=matlab]
 % (4) 在此位置写程序，用filter函数s_f计算激励，注意保持滤波器状态
     [exc_ftr,zi_pre] = filter(A,1,s_f,zi_pre);
@@ -127,7 +127,7 @@ $，$a_2 = -0.9506$，上述合成模型的共振峰频率是多少？用zplane 
 \textbf{\color{gray}完善 speechproc.m 程序， 在循环中添加程序： 用你计算得到的激励信号 e(n) 和预
 测模型系数 $\{a_i\} $ ， 用 filter 计算重建语音 $\hat{s}(n)$ 。}
 
-类似地有：
+类似地有（注意输入输出）：
 \begin{lstlisting}[language=matlab]
 % (5) 在此位置写程序，用filter函数和exc重建语音，注意保持滤波器状态
     [rec_ftr,zi_rec] = filter(1,A,exc_ftr,zi_rec);
@@ -229,9 +229,73 @@ e(n) 有何区别。}
 	\centering
 	\begin{minipage}{0.49\linewidth}
 		\centering
-		\includegraphics[width=0.9\linewidth]{drawing2-9.png}
+		\includegraphics[width=0.7\linewidth]{drawing2-9.png}
 		\caption{输入e(n)与输出s(n)信号比较}
 	\end{minipage}
 \end{figure}
+\subsection*{(10)}
+\textbf{\color{gray}重改 speechproc.m 程序。 利用每一帧已经计算得到的基音周期和（8） 的方法，
+生成合成激励信号 Gx(n)（ G 是增益）， 用 filter 函数将 Gx(n) 送入合成滤波器得到合成语
+音 s~(n) 。 试听和原始语音有何差别。}
+
+帧长FL=80。模仿(8)中代码，在循环开始前预置k=2FL+1(即从第3帧开始)：
+\begin{lstlisting}[language=matlab]
+k = 2*FL + 1;
+\end{lstlisting}
+k作为下标，为合成激励信号exc\_syn在适当位置添加加权脉冲，具体操作如下：
+\begin{lstlisting}[language=matlab]
+while k <= FL*n
+    exc_syn(k) = G;
+    k = k + PT;
+end
+\end{lstlisting}
+k按照已经计算好的PT跳跃，在当前帧添加加权脉冲，当超过当前帧范围时结束，
+完成当前帧激励信号的合成。
+
+将当前帧激励信号输入滤波器（注意保存状态），即得合成语音$\tilde{s}(n)$：
+\begin{lstlisting}[language=matlab]
+[s_syn((n-1)*FL+1:n*FL),zi_syn] = filter(1,A,exc_syn((n-1)*FL+1:n*FL),zi_syn);
+\end{lstlisting}
+\begin{figure}[h]
+	\centering
+	\begin{minipage}{0.49\linewidth}
+		\centering
+		\includegraphics[width=0.7\linewidth]{drawing2-10.png}
+		\caption{合成信号比较}
+	\end{minipage}
+\end{figure}
+听觉上，s(n)与$\tilde{s}(n)$无明显不同，观察图像发现s(n)局部幅度更大些，
+其余差异亦不显著。
+
+\section{变速不变调}
+\subsection*{(11)}
+\textbf{\color{gray}仿照（10） 重改 speechproc.m 程序， 只不过将（10） 中合成激励的长度增加一倍，
+即原来 10 毫秒的一帧变成了 20 毫秒一帧， 再用同样的方法合成出语音来。}
+
+将n统一改为2n即可：
+\begin{lstlisting}[language=matlab]
+% (11) 不改变基音周期和预测系数，将合成激励的长度增加一倍，再作为filter
+% 的输入得到新的合成语音，听一听是不是速度变慢了，但音调没有变。
+while k_v <= FL*n*2
+    exc_syn_v(k_v) = G;
+    k_v = k_v + PT;
+end
+
+[s_syn_v(2*(n-1)*FL+1:2*n*FL),zi_syn_v] = filter(1,A,exc_syn_v(2*(n-1)*FL+1:2*n*FL),zi_syn_v);
+\end{lstlisting}
+\begin{figure}[h]
+	\centering
+	\begin{minipage}{0.49\linewidth}
+		\centering
+		\includegraphics[width=1\linewidth]{drawing2-11.png}
+		\caption{合成信号比较}
+	\end{minipage}
+\end{figure}
+听取语音，记录两个语音(s,s\_v)播放的大致时间，以及观察图像横坐标，可知信号长度确实增加了一倍;
+此外音调并无明显变化，说明实现了变速不变调。
+
+\subsection*{(12)}
+\textbf{\color{gray}重新考察（1） 中的系统， 
+将其共振峰频率提高 150Hz 后的 $a_1$ 和 $a_2$ 分别是多少？}
 
 \end{document}
