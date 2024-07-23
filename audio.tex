@@ -52,7 +52,7 @@
 \maketitle
 \section{语音预测模型}
 \subsection*{(1)}
-\textbf{
+\textbf{\color{gray}
 给定$$e(n) = s(n) - a_1s(n - 1) - a_2s(n - 2)$$
 假设 e(n) 是输入信号， s(n) 是输出信号， 上述滤波器的传递函数是什么？ 如果 $a_1 = 1.3789
 $，$a_2 = -0.9506$，上述合成模型的共振峰频率是多少？用zplane ， freqz ， impz分别绘出零
@@ -94,9 +94,9 @@ $，$a_2 = -0.9506$，上述合成模型的共振峰频率是多少？用zplane 
 \end{figure}
 \newpage
 \subsection*{(3)((2)略)}
-\textbf{运行程序到 27 帧时停住， 用（1） 中的方法观察零极点图。}
+\textbf{\color{gray}运行程序到 27 帧时停住， 用（1） 中的方法观察零极点图。}
 
-如下所示，用zplane函数绘制E,A决定的零极点图即可。
+如下所示，用zplane函数绘制E,A决定的零极点图即可。注意A是预测系数，应用以表示z变换表达式的分母部分。
 \begin{lstlisting}[language=matlab]
 % (3) 在此位置写程序，观察预测系统的零极点图
     zplane(E,A);
@@ -112,7 +112,7 @@ $，$a_2 = -0.9506$，上述合成模型的共振峰频率是多少？用zplane 
 \end{figure}
 
 \subsection*{(4)}
-\textbf{在循环中添加程序： 对每帧语音信号 s(n) 和预测模型系数 $\{a_i\} $， 用 filter 计算
+\textbf{\color{gray}在循环中添加程序： 对每帧语音信号 s(n) 和预测模型系数 $\{a_i\} $， 用 filter 计算
 激励信号 e(n) 。}
 
 由于分帧处理，需要保存滤波器的最终条件zf，且需要考虑滤波器的初始状态zi，在代码中表现为更新zi\_pre
@@ -124,7 +124,7 @@ $，$a_2 = -0.9506$，上述合成模型的共振峰频率是多少？用zplane 
 % exc((n-1)*FL+1:n*FL) = ... 将你计算得到的激励写在这里
 \end{lstlisting}
 \subsection*{(5)}
-\textbf{完善 speechproc.m 程序， 在循环中添加程序： 用你计算得到的激励信号 e(n) 和预
+\textbf{\color{gray}完善 speechproc.m 程序， 在循环中添加程序： 用你计算得到的激励信号 e(n) 和预
 测模型系数 $\{a_i\} $ ， 用 filter 计算重建语音 $\hat{s}(n)$ 。}
 
 类似地有：
@@ -136,11 +136,13 @@ $，$a_2 = -0.9506$，上述合成模型的共振峰频率是多少？用zplane 
 \end{lstlisting}
 
 \subsection*{(6)}
-\textbf{在循环结束后添加程序： 用 sound 试听（6） 中的 e(n) 信号， 比较和 s(n) 以及 $\hat{s}(n)$
+\textbf{\color{gray}在循环结束后添加程序： 用 sound 试听（6） 中的 e(n) 信号， 比较和 s(n) 以及 $\hat{s}(n)$
 信号有何区别。 对比画出三个信号， 选择一小段， 看看有何区别。}
 
-三个信号载有的信息均为“电灯比油灯进步多了”。
-e(n)信号噪声较大；s(n)信号和$\hat{s}(n)$信号听起来几乎没有区别，且两者噪声相对e(n)较小。
+信号所载信息均为“电灯比油灯进步多了”。
+e(n)信号噪声较大；s(n)信号和$\hat{s}(n)$信号听起来几无区别，且两者噪声相对e(n)较小。因为
+e(n)是语音信号s(n)和$\sum_{k=1}^{N}a_ks(n-k)$的差（残差），自然与s(n)相差较大；作为激励信号可以
+较好重建语音。
 \begin{figure}[h]
 	\centering
 	\begin{minipage}{0.49\linewidth}
@@ -150,7 +152,7 @@ e(n)信号噪声较大；s(n)信号和$\hat{s}(n)$信号听起来几乎没有区
 	\end{minipage}
 \end{figure}
 
-选取[2000,4000]局部区间比较：
+选取[2000,4000]局部区间比较，
 \begin{figure}[h]
 	\centering
 	\begin{minipage}{0.49\linewidth}
@@ -159,11 +161,77 @@ e(n)信号噪声较大；s(n)信号和$\hat{s}(n)$信号听起来几乎没有区
 		\caption{语音信号比较（局部）}
 	\end{minipage}
 \end{figure}
-进一步验证了前述判断。
+进一步验证了前述判断：
 \section{语音合成模型}
 \subsection*{(7)}
-\textbf{生成一个 8kHz 抽样的持续 1 秒钟的数字信号， 该信号是一个频率为 200Hz 的单
+\textbf{\color{gray}生成一个 8kHz 抽样的持续 1 秒钟的数字信号， 该信号是一个频率为 200Hz 的单
 位样值“串”， 即$$x(n)=\sum_{i=0}^{NS-1}\delta(n-iN)$$考虑该信号的 N 和 NS 分别为何值？ 
 用 sound 试听这个声音信号。 再生成一个 300Hz 的单位样值“串”并试听， 有何区别？ }
-$$N=\frac{1}{8kHz}=1.25\times10^{-4}$$
+
+\textcircled{1}抽样频率的定义为单位时间内从连续信号中提取并组成离散信号的抽样个数。
+故1s内的抽样点有8000个；该信号频率为200Hz，故$NS=200$,$N=\frac{8000}{200}=40$。
+定义抽样频率
+\begin{lstlisting}[language=matlab]
+fsp=8000;
+\end{lstlisting}
+则用sound试听声音信号的代码为(注意到sound默认声音时长为1s)
+\begin{lstlisting}[language=matlab]
+seq1=zeros(fsp,1);
+f1=200;
+pulse1=floor(fsp/f1);
+for n=1:f1 %matlab start from 1
+    seq1(pulse1*n)=1;
+end
+sound(seq1);
+\end{lstlisting}
+
+\textcircled{2}同上，信号频率为300Hz时，$NS=300$,$N=\frac{8000}{300}=26$,试听代码为
+\begin{lstlisting}[language=matlab]
+seq2=zeros(fsp,1);
+f2=300;
+pulse2=floor(fsp/f2);
+for n=1:f2 %matlab start from 1
+    seq2(pulse2*n)=1;
+end
+sound(seq2);
+	\end{lstlisting}
+
+注意到，300Hz信号的音调显著地比200Hz音调要高。
+
+\subsection*{(8)}
+\textbf{\color{gray}真实语音信号的基音周期总是随着时间变化的。我们首先将信号分成若干个 10
+毫秒长的段， 假设每个段内基音周期固定不变，但段和段之间则不同，具体为
+$$PT = 80 + 5mod(m,50)$$
+其中PT表示基音周期， m表示段序号。生成1秒钟的上述信号并试听。}
+
+由于段长为10ms，总长为1s，易知信号的段数为100，则信号生成并试听的代码为
+\begin{lstlisting}[language=matlab]
+fsp=8000; N=100;
+seq=zeros(fsp,1); n=1;
+while n<=fsp
+    seq(n)=1;
+    m=ceil(n/(fsp/N));
+    PT=80+5*mod(m,50);
+    n=n+PT;
+end
+sound(seq);
+\end{lstlisting}
+相邻两个脉冲间的PT值由更靠前的那个脉冲（所在的段号）决定。
+
+\subsection*{(9)}
+\textbf{\color{gray}用 filter 将（8） 中的激励信号 e(n) 输入到（1） 的系统中计算输出 s(n) ， 试听和
+e(n) 有何区别。}
+
+试听比较，发现有显著变化，通过图像进一步观察其变化情况。将e(n)视为一系列冲激信号
+的叠加，则s(n)则对应为各冲激信号响应的叠加。各个冲激信号及其响应情况与[图3：冲激响应
+]所示大体上是吻合的。
+\begin{figure}[h]
+	\centering
+	\begin{minipage}{0.49\linewidth}
+		\centering
+		\includegraphics[width=0.9\linewidth]{drawing2-9.png}
+		\caption{输入e(n)与输出s(n)信号比较}
+	\end{minipage}
+\end{figure}
+
 \end{document}
